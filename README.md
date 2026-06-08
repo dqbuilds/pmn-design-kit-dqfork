@@ -32,8 +32,14 @@ episode-01/           # the episode generators + the guest assets they use
 skills/market-data/   # the scripts that SOURCED the market data (see below)
 skills/podcast-research/ # editorial framing / question / thread workflows
 brand/                # The Block + Polymarket marks, PMN logo lockups
+frames/               # static on-air broadcast frames + lower-thirds (not code-gen)
 AGENTS.md             # end-to-end guide for an agent to generate visuals
 ```
+
+`frames/` holds the static 1920×1080 broadcast frames (Single/Two/Four-cam +
+market overlay) with their lower-third name chips. These are design exports, not
+code-generated — see `frames/README.md`. `lib/pmn.py` has `chrome()` +
+`name_chip()` if you want to build a frame generator later.
 
 ## Data sourcing (`skills/market-data/`)
 
