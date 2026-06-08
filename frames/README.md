@@ -1,19 +1,27 @@
-# Broadcast frames (static)
+# Broadcast frames + lower-thirds (static SVG)
 
-On-air video frames for the PMN show (1920×1080), from Design Draft 1:
+On-air video assets for the PMN show (1920×1080), from Design Draft 1. **Vector
+SVG is the source of truth; a `.png` preview sits next to each** (regenerate with
+`rsvg-convert <file>.svg -o <file>.png`).
 
-- `Single-Cam Frame.png` — solo host, lower-third name chip
-- `Two-Cam Frame.png` — host + guest
-- `Four-Cam Frame.png` — host / co-host / two guests, each with a lower-third
-- `Market Overlay + 2 cams.png` — Polymarket market card + two camera feeds
+## Frames (`frames/`)
+- `Single-Cam Frame.svg` — solo host
+- `Two-Cam Frame.svg` — host + guest
+- `Three-cam Frame.svg` — host + two
+- `Four-Cam Frame.svg` — host / co-host / two guests
+- `Market Overlay + 2 cams.svg`, `+ 3 cams`, `+ 4 cams` — Polymarket market card + cam feeds
 
-**These are static design exports, not code-generated** (unlike the cards,
-covers, and podcast covers, which have Python generators). They carry The Block +
-Polymarket chrome and the **lower-third name chips** (HOST / CO-HOST / GUEST) —
-the lower-thirds are baked into each frame, there are no standalone lower-third
-files.
+Each carries The Block + Polymarket chrome and the lower-third name chips.
+(Camera wells use watermarked stock as placeholders — swap for live feeds.)
 
-If you want code-generated, per-episode frames or standalone transparent
-lower-thirds, `lib/pmn.py` already has the building blocks — `chrome()` and
-`name_chip(x, y, role, name, line2, line3)` (the broadcast lower-third) — so a
-frame generator can be built the same way as `_podcast_covers.py`.
+## Lower-thirds (`frames/lower-thirds/`)
+Standalone name-chip overlays (blue plate + black role tab):
+- `lower-third-host.svg` / `lower-third-host-full.svg` — HOST (1-line / 3-line)
+- `lower-third-cohost.svg` / `lower-third-cohost-full.svg` — CO-HOST
+- `lower-third-guest-full.svg` — GUEST (name / title / company)
+- `lower-third-guest-1..4.svg` — GUEST 1–4 (compact)
+
+## Note
+These are **static design exports, not code-generated**. `lib/pmn.py` has the
+building blocks (`chrome()`, `name_chip(role, name, line2, line3)`) if you want a
+parameterized frame / lower-third generator later.

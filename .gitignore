@@ -14,3 +14,6 @@ venv/
 **/exports-*/
 *.svg
 !brand/marks/*.svg
+# static vector assets (frames + lower-thirds are the source of truth, keep them)
+!frames/*.svg
+!frames/lower-thirds/*.svg
