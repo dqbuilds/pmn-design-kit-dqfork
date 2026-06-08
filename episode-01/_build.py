@@ -189,8 +189,9 @@ def check(bg_img, name, region, fg=(255,255,255), large=True):
 
 
 def footer(w, h, align="left"):
-    lh = round(h*0.05); x = M(w) if align == "left" else w - M(w)
-    return logo("sans-news", x, h-M(w)-lh+round(lh*0.15), lh, align=align, opacity=0.96)
+    # larger-format covers carry the full PMN show wordmark
+    lh = round(h*0.038); x = M(w) if align == "left" else w - M(w)
+    return logo("pmn-wordmark", x, h-M(w)-lh+round(lh*0.15), lh, align=align, opacity=0.96)
 
 
 def guest_text_block(w, x, top, glow=True):

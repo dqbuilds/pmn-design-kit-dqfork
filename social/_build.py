@@ -28,7 +28,7 @@ os.makedirs(OUT, exist_ok=True)
 
 # Final four (Kelvin, 2026-06-03). Wordmarks sign the cards; marks lead cover/avatar.
 #   sans-news · bold-bar  = wordmarks   |   monogram · arrow-n = marks
-FOOTER_LOGO = "sans-news"
+FOOTER_LOGO = "pmn-wordmark"   # larger-format covers use the full show wordmark
 
 # Platform size matrix
 SIZES = {
@@ -51,7 +51,7 @@ def aspect(w, h):
 
 # footer height per lockup — stacked/pictorial marks need more height to read
 _FOOTER_H = {"monogram": 0.045, "sans-news": 0.050, "sans-stack": 0.050,
-             "bold-bar": 0.072, "arrow-n": 0.090}
+             "bold-bar": 0.072, "arrow-n": 0.090, "pmn-wordmark": 0.038}
 
 def footer_sig(w, h, which=None, align="left"):
     """Real PMN lockup, bottom signature (Block already leads top-left).
