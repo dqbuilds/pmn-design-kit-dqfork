@@ -19,6 +19,13 @@ entirely. Adding a brand is adding a mode, not rebuilding cards.
 
 Edit colours visually on the **🎨 Foundations → Brand System** board, or in the Variables panel.
 
+**Switch a card's brand in Figma:** select the card → right panel → **Appearance** section →
+the **`Brand`** dropdown (just under *Opacity* / *Corner radius*) → pick **PMN** or **Demo**. It
+reads *"Mixed"* on a whole card because the nested Background/Header/Footer instances carry their
+own modes — picking a brand forces the whole selection. It is **not** in the right-click menu.
+Select multiple cards (or the Section) to flip them together. For rendered *outputs* you don't
+touch this — `renderCard(…, "Demo", …)` sets the mode on the exported frame.
+
 ---
 
 ## Make a NEW CARD (a new post)
@@ -103,6 +110,23 @@ Plugin-data (namespace `pmn`) on each slot: `bind` (data path) · `kind` · `for
 - The field/background reskins automatically via the brand mode (gradient stops bound to `color/field/*`).
 
 ---
+
+## Handing off to / from a data analyst
+
+This kit is built so a Figma-native designer and a data analyst each work in their own tool and
+hand off through one shared contract: `templates/*.manifest.json` + `tokens.json` (both
+**generated — never hand-edited**). The full two-direction workflow is in the
+**[README → Working together: designer ↔ analyst](README.md#working-together--designer--analyst)**.
+
+In short:
+- **Designer → analyst:** edit the layout in Figma, name/tag the data slots (`#`/`@` + `pmn`
+  `bind`/`kind`/`format`), run `export_manifest.js`, commit the manifest. The analyst renders it
+  with data — no Figma needed.
+- **Analyst → designer:** render with data via `render.js`; when you need a *layout* change or a
+  *new* data field surfaced, send the designer the template + the exact `bind` path + an example
+  render. They edit Figma and re-export.
+- **The split:** *how it looks / a new slot* = designer (Figma + re-export); *which data / how a
+  number is computed* = analyst (data + manifest `bind`).
 
 ## Tests
 
