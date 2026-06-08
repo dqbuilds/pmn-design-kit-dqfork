@@ -1,0 +1,16 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.Python
+venv/
+.venv/
+
+# OS
+.DS_Store
+
+# Generated output (regenerate with the scripts)
+**/exports/
+**/exports-*/
+*.svg
+!brand/marks/*.svg
