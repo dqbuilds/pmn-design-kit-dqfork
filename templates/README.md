@@ -26,6 +26,18 @@ a token rebinding, a new brand mode, a new list) requires a re-export:
 
 The manifest is generated — **do not hand-edit it.**
 
+## v3 architecture (current)
+
+- **Shared chrome.** Every card instances a `Header` + `Footer` component (the real Block /
+  Polymarket / show logos + the accent-tab hairline). One edit propagates to all cards.
+- **Background is a component** (`Background` variant set: Gradient · Solid · Glow · Image), placed
+  as the card's bottom layer. Its gradient stops bind to `color/field/*`, so the field reskins on
+  the brand-mode switch (no code-set). The Image variant has an `@bg.image` slot for textures/photos.
+- **Brands are modes** of the `Brand` variable collection (PMN, Demo, …). Adding a sub-brand = add a
+  mode and fill its token column; swap logos via `brands.json`. Component names are brand-neutral.
+- **Tokens mirror to code** via `tools/export_tokens.js` → `tokens.json`; the **Brand System board**
+  on the Foundations page is the visual control surface (swatches bound to the live variables).
+
 ## Slot convention (the contract)
 
 Slots are nodes named `#…` (content) or `@…` (geometry). Each carries its data
@@ -39,10 +51,11 @@ binding as shared plugin data (namespace `pmn`: `bind`, `kind`, `format`,
 | `arc` | `@…` ellipse | sweeps the donut arc proportional to `bind` |
 | `linechart` | `@…` frame | draws gridlines + area + polyline from a `bind` series |
 | `image` | `@…` rect/ellipse | photo well — bytes placed via `upload_assets` (see below) |
-| `logo` | `#…` instance | real logo component; per-brand swap is a future enhancement |
-| `brand-content` | `#…` text | per-brand text (wordmark/sponsor/footer) |
-| `field` | `field` node | code-set gradient (gradients can't bind variables) |
-| `pmn:list` | frame | repeating list of a row component (`panel` ← `card.rows`) |
+| `logo` | `#…` instance | real logo component; renderer swaps it per brand (after detaching the shared chrome) |
+| `delta` | `#…` frame | container with `tri.up`/`tri.down` triangle **shapes** + a `val` text; renderer shows the right triangle and colors the value green/red by the **sign** of the bound number |
+| `field` | (none in v3) | v3 binds the Background's gradient stops to `color/field/*`, so it reskins via the brand mode. legacy v2 used a code-set `field` node |
+| `brand-content` | `#…` text | (legacy v2) per-brand text; v3 uses real logos instead |
+| `pmn:list` | frame | repeating list; declares its row component in `pmn:list-item`. Renderer clones **and detaches** each row (instance sublayers can't be resized) |
 
 Reflow is automatic: every template is auto-layout, so text length and
 list length resize the panel and re-center the column (within reason).

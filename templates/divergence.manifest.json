@@ -1,31 +1,119 @@
 {
-  "template": "market-card-divergence",
-  "version": "0.2",
-  "_generated": "by tools/export_manifest.js from Figma — do not hand-edit; re-run the exporter after editing the template in Figma",
+  "template": "divergence",
+  "version": "0.3",
+  "_generated": "by tools/export_manifest.js from Figma — do not hand-edit",
   "figma": {
     "fileKey": "ILPUHPFyGRtLnc0JJ6lGyW",
-    "componentName": "PMN / Market Card — Divergence (v2 · auto-layout)",
-    "componentNodeId": "23:133",
-    "canvas": [1080, 1080],
+    "componentName": "Card / Divergence",
+    "componentNodeId": "84:66",
+    "canvas": [
+      1080,
+      1080
+    ],
     "autolayout": true
   },
-  "brand": { "collection": "Brand", "modes": ["PMN", "Demo"], "mechanism": "setExplicitVariableModeForCollection" },
-  "field": { "node": "field", "kind": "gradient", "codeSet": true, "stops": ["color/field/start", "color/field/mid", "color/field/end"] },
+  "brand": {
+    "collection": "Brand",
+    "modes": [
+      "PMN",
+      "Demo"
+    ],
+    "mechanism": "setExplicitVariableModeForCollection"
+  },
+  "field": null,
   "slots": [
-    { "name": "#brand.wordmark", "kind": "brand-content", "bind": "brand.wordmark", "token": "color/text" },
-    { "name": "#sponsor", "kind": "brand-content", "bind": "brand.sponsor", "token": "color/muted" },
-    { "name": "#footer", "kind": "brand-content", "bind": "brand.footer", "token": "color/text" },
-    { "name": "#eyebrow", "kind": "text", "bind": "card.tag", "transform": "uppercase", "token": "color/eyebrow-ink" },
-    { "name": "#headline", "kind": "text", "bind": "card.question", "reflow": true, "token": "color/text" },
-    { "name": "#left.label", "kind": "text", "bind": "card.left.label", "transform": "uppercase", "token": "color/eyebrow-ink" },
-    { "name": "#left.stat", "kind": "text", "bind": "card.left.stat", "token": "color/down" },
-    { "name": "#left.detail", "kind": "text", "bind": "card.left.detail", "token": "color/text" },
-    { "name": "#left.sub", "kind": "text", "bind": "card.left.sub", "token": "color/muted" },
-    { "name": "#right.label", "kind": "text", "bind": "card.right.label", "transform": "uppercase", "token": "color/eyebrow-ink" },
-    { "name": "#right.stat", "kind": "text", "bind": "card.right.stat", "token": "color/up" },
-    { "name": "#right.detail", "kind": "text", "bind": "card.right.detail", "token": "color/text" },
-    { "name": "#right.sub", "kind": "text", "bind": "card.right.sub", "token": "color/muted" },
-    { "name": "#caption", "kind": "text", "bind": "card.caption", "reflow": true, "token": "color/off" },
-    { "name": "#source", "kind": "text", "bind": "card.source", "format": "Source: {}", "token": "color/muted" }
+    {
+      "name": "#logo.publisher",
+      "kind": "logo",
+      "bind": "brand.publisher"
+    },
+    {
+      "name": "#logo.sponsor",
+      "kind": "logo",
+      "bind": "brand.sponsor"
+    },
+    {
+      "name": "#eyebrow",
+      "kind": "text",
+      "bind": "card.tag",
+      "transform": "uppercase",
+      "token": "color/eyebrow-ink"
+    },
+    {
+      "name": "#headline",
+      "kind": "text",
+      "bind": "card.question",
+      "reflow": true,
+      "token": "color/text"
+    },
+    {
+      "name": "#left.label",
+      "kind": "text",
+      "bind": "card.left.label",
+      "transform": "uppercase",
+      "token": "color/eyebrow-ink"
+    },
+    {
+      "name": "#left.delta",
+      "kind": "delta",
+      "bind": "card.left.delta",
+      "format": "{}%"
+    },
+    {
+      "name": "#left.detail",
+      "kind": "text",
+      "bind": "card.left.detail",
+      "token": "color/text"
+    },
+    {
+      "name": "#left.sub",
+      "kind": "text",
+      "bind": "card.left.sub",
+      "token": "color/muted"
+    },
+    {
+      "name": "#right.label",
+      "kind": "text",
+      "bind": "card.right.label",
+      "transform": "uppercase",
+      "token": "color/eyebrow-ink"
+    },
+    {
+      "name": "#right.delta",
+      "kind": "delta",
+      "bind": "card.right.delta",
+      "format": "{}%"
+    },
+    {
+      "name": "#right.detail",
+      "kind": "text",
+      "bind": "card.right.detail",
+      "token": "color/text"
+    },
+    {
+      "name": "#right.sub",
+      "kind": "text",
+      "bind": "card.right.sub",
+      "token": "color/muted"
+    },
+    {
+      "name": "#caption",
+      "kind": "text",
+      "bind": "card.caption",
+      "reflow": true,
+      "token": "color/muted"
+    },
+    {
+      "name": "#logo.show",
+      "kind": "logo",
+      "bind": "brand.show"
+    },
+    {
+      "name": "#source",
+      "kind": "text",
+      "bind": "card.source",
+      "format": "{}",
+      "token": "color/muted"
+    }
   ]
 }

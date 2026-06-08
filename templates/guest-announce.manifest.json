@@ -1,24 +1,80 @@
 {
-  "template": "social-guest-announce",
-  "version": "0.2",
-  "_generated": "by tools/export_manifest.js from Figma — do not hand-edit; re-run the exporter after editing the template in Figma",
+  "template": "guest-announce",
+  "version": "0.3",
+  "_generated": "by tools/export_manifest.js from Figma — do not hand-edit",
   "figma": {
     "fileKey": "ILPUHPFyGRtLnc0JJ6lGyW",
-    "componentName": "PMN / Social — Guest Announce (v2)",
-    "componentNodeId": "36:133",
-    "canvas": [1080, 1080],
+    "componentName": "Card / Guest-Announce",
+    "componentNodeId": "94:222",
+    "canvas": [
+      1080,
+      1080
+    ],
     "autolayout": true
   },
-  "brand": { "collection": "Brand", "modes": ["PMN", "Demo"], "mechanism": "setExplicitVariableModeForCollection" },
-  "field": { "node": "field", "kind": "gradient", "codeSet": true, "stops": ["color/field/start", "color/field/mid", "color/field/end"] },
+  "brand": {
+    "collection": "Brand",
+    "modes": [
+      "PMN",
+      "Demo"
+    ],
+    "mechanism": "setExplicitVariableModeForCollection"
+  },
+  "field": null,
   "slots": [
-    { "name": "#logo.publisher", "kind": "logo", "bind": "brand.publisher", "_note": "real Block logo instance; per-brand swap is a future enhancement" },
-    { "name": "#logo.sponsor", "kind": "logo", "bind": "brand.sponsor" },
-    { "name": "#eyebrow", "kind": "text", "bind": "card.tag", "transform": "uppercase", "token": "color/eyebrow-ink" },
-    { "name": "@photo", "kind": "image", "bind": "card.photo", "_note": "fetched from a URL via figma.createImageAsync at render" },
-    { "name": "#guest.name", "kind": "text", "bind": "card.guest.name", "reflow": true, "token": "color/text" },
-    { "name": "#guest.role", "kind": "text", "bind": "card.guest.role", "token": "color/muted" },
-    { "name": "#guest.company", "kind": "text", "bind": "card.guest.company", "transform": "uppercase", "token": "color/eyebrow-ink" },
-    { "name": "#footer", "kind": "logo", "bind": "brand.footerLogo" }
+    {
+      "name": "#logo.publisher",
+      "kind": "logo",
+      "bind": "brand.publisher"
+    },
+    {
+      "name": "#logo.sponsor",
+      "kind": "logo",
+      "bind": "brand.sponsor"
+    },
+    {
+      "name": "#eyebrow",
+      "kind": "text",
+      "bind": "card.tag",
+      "transform": "uppercase",
+      "token": "color/eyebrow-ink"
+    },
+    {
+      "name": "@photo",
+      "kind": "image",
+      "bind": "card.photo"
+    },
+    {
+      "name": "#guest.name",
+      "kind": "text",
+      "bind": "card.guest.name",
+      "reflow": true,
+      "token": "color/text"
+    },
+    {
+      "name": "#guest.role",
+      "kind": "text",
+      "bind": "card.guest.role",
+      "token": "color/muted"
+    },
+    {
+      "name": "#guest.company",
+      "kind": "text",
+      "bind": "card.guest.company",
+      "transform": "uppercase",
+      "token": "color/eyebrow-ink"
+    },
+    {
+      "name": "#logo.show",
+      "kind": "logo",
+      "bind": "brand.show"
+    },
+    {
+      "name": "#source",
+      "kind": "text",
+      "bind": "card.source",
+      "format": "{}",
+      "token": "color/muted"
+    }
   ]
 }

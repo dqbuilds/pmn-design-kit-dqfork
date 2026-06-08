@@ -1,5 +1,11 @@
 {
-  "_doc": "Brand registry. The render pipeline picks a brand, sets its variable mode, and passes this config into renderCard as ctx.brand. The 'logo' slot kind swaps each logo instance to the brand's component by id; 'brand-content' text slots use the text values. Logo ids are file-local — if a logo component is recreated, update the id here (or re-run a lookup by name).",
+  "_doc": "Brand registry. The render pipeline picks a brand, sets its Brand-collection variable MODE, and passes this config into renderCard as ctx.brand. The 'logo' slot kind swaps each logo instance to the brand's component by id. Logo ids are file-local — if a logo component is recreated, update the id here (or re-run a lookup by name).",
+  "_addBrand": [
+    "1. In Figma, add a MODE to the Brand variable collection and fill its token column (colors + fonts). The Brand System board on the Foundations page is the easiest place to eyeball it.",
+    "2. Add the brand's logo components (publisher / sponsor / show) to the file and record their ids in a new entry below.",
+    "3. Run tools/export_tokens.js and commit templates/tokens.json. Render with brandMode set to the new mode name.",
+    "Components are not per-brand-hardcoded — they bind to Brand tokens, so a new mode reskins every card automatically."
+  ],
   "PMN": {
     "mode": "PMN",
     "logos": {

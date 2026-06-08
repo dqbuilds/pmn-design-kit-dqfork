@@ -5,22 +5,24 @@
  * template whose manifest follows the contract, so new templates need no new
  * render code — only a component + a manifest.
  *
- * Slot kinds handled: text, bar, arc (donut), linechart, list (variable-length),
- * plus brand-mode reskin and the code-set gradient field.
+ * Slot kinds handled: text, bar, arc (donut), linechart, delta (sign-driven
+ * triangle+value), list (variable-length), image, logo, plus brand-mode reskin.
  *
- * Steps (all via the Figma Plugin API):
- *   1. instantiate the template component, detach to an editable frame
- *   2. set the brand mode (reskins every bound solid + font) and code-set the
- *      field gradient from the brand's field tokens
- *   3. fill each slot from its bind path
- *   4. expand lists: clear example rows, clone the row component per data item
- *   5. export — screenshot inline here; for a file, the orchestration layer
- *      pulls the node via REST GET /v1/images/:key?ids=:nodeId&format=png
+ * Architecture (v3):
+ *   - Chrome is a shared Header/Footer component instanced in every card. The
+ *     renderer detaches those chrome instances after the top-level detach so
+ *     their logos/source become editable/swappable (detachInstance unwraps one
+ *     level only). Chrome instances are tagged pmn:role=chrome.
+ *   - The field is a Background component instance whose gradient stops are bound
+ *     to color/field/* — so it reskins automatically on the brand mode switch
+ *     (no code-set field needed; manifest.field is null for v3 cards).
+ *   - Lists clone the row component AND detach each clone, because instance
+ *     sublayers cannot be resized (bar widths) — only detached nodes can.
  *
  * HOW TO RUN (on-demand / agent-triggered):
  *   Paste this file into a use_figma call, then append:
  *       const MANIFEST = <paste templates/<name>.manifest.json>;
- *       const CTX = { card: <fill data>, brand: { wordmark, sponsor, footer } };
+ *       const CTX = { card: <fill data>, brand: { logos: {...} } };
  *       return await renderCard(MANIFEST, CTX, "PMN", { x: 9000, y: 0 });
  */
 function get(o, p) {
@@ -35,16 +37,16 @@ function fmt(v, slot) {
 // Geometry is code-generated (an arbitrary polyline can't be a static slot).
 function drawLineChart(plot, series, env) {
   plot.children.slice().forEach((c) => c.remove());
-  const W = plot.width, H = plot.height, padL = 46, padT = 14, padB = 38;
+  const W = plot.width, H = plot.height, padL = 52, padT = 14, padB = 42;
   const plx = padL, ply = padT, plw = W - padL, plh = H - padT - padB;
   const X = (i) => plx + plw * i / (series.length - 1);
   const Y = (v) => ply + plh * (1 - v / 100);
   for (const g of [0, 50, 100]) {
     const gy = Y(g);
     const r = figma.createRectangle(); r.resize(plw, g === 50 ? 2 : 1.5); r.x = plx; r.y = gy;
-    r.fills = [{ type: "SOLID", color: { r: 1, g: 1, b: 1 }, opacity: g === 50 ? 0.18 : 0.1 }]; plot.appendChild(r);
-    const l = figma.createText(); l.fontName = { family: "Inter", style: "Medium" }; l.fontSize = 16; l.characters = g + "%";
-    l.fills = [{ type: "SOLID", color: env.muted }]; plot.appendChild(l); l.x = plx - l.width - 8; l.y = gy - l.height / 2;
+    r.fills = [{ type: "SOLID", color: { r: 1, g: 1, b: 1 }, opacity: g === 50 ? 0.16 : 0.09 }]; plot.appendChild(r);
+    const l = figma.createText(); l.fontName = { family: "IBM Plex Mono", style: "Medium" }; l.fontSize = 16; l.characters = g + "%";
+    l.fills = [{ type: "SOLID", color: env.muted }]; plot.appendChild(l); l.x = plx - l.width - 10; l.y = gy - l.height / 2;
   }
   const pts = series.map((s, i) => [X(i), Y(s[1])]);
   const path = pts.map((p) => p[0] + " " + p[1]).join(" L ");
@@ -60,9 +62,9 @@ function drawLineChart(plot, series, env) {
   dot.fills = [{ type: "SOLID", color: env.accent }]; dot.strokes = [{ type: "SOLID", color: { r: 1, g: 1, b: 1 } }]; dot.strokeWeight = 3; plot.appendChild(dot);
   for (const i of [0, Math.floor(series.length / 2), series.length - 1]) {
     if (!series[i][0]) continue;
-    const l = figma.createText(); l.fontName = { family: "Inter", style: "Medium" }; l.fontSize = 16; l.characters = series[i][0];
+    const l = figma.createText(); l.fontName = { family: "IBM Plex Mono", style: "Medium" }; l.fontSize = 16; l.characters = series[i][0];
     l.fills = [{ type: "SOLID", color: env.muted }]; plot.appendChild(l);
-    l.x = Math.min(Math.max(X(i) - l.width / 2, plx), plx + plw - l.width); l.y = ply + plh + 10;
+    l.x = Math.min(Math.max(X(i) - l.width / 2, plx), plx + plw - l.width); l.y = ply + plh + 12;
   }
 }
 
@@ -80,10 +82,9 @@ async function fillSlot(root, slot, scope, max, env) {
   } else if (slot.kind === "linechart") {
     drawLineChart(node, get(scope, slot.bind) || [], env);
   } else if (slot.kind === "image") {
-    // Photos are placed OUT OF BAND: the Figma plugin sandbox can't fetch URLs
-    // (createImageAsync is unavailable here). The orchestration layer fetches the
-    // URL in the data → bytes → POSTs them to the upload_assets submitUrl bound to
-    // this node. renderCard returns image-slot node ids so the caller knows where.
+    // Photos are placed OUT OF BAND: the Figma plugin sandbox can't fetch URLs.
+    // The orchestration layer fetches the URL → bytes → POSTs to an upload_assets
+    // submitUrl bound to this node. renderCard returns image-slot node ids.
     return;
   } else if (slot.kind === "logo") {
     // per-brand logo swap: replace the instance's main component with the active
@@ -99,6 +100,21 @@ async function fillSlot(root, slot, scope, max, env) {
     node.swapComponent(comp);
     node.resize(h * (comp.width / comp.height), h);
     return;
+  } else if (slot.kind === "delta") {
+    // Sign-driven delta: toggle the up/down triangle SHAPES (no dropping glyphs)
+    // and color the value green/red by sign. Container holds tri.up, tri.down, val.
+    const v = Number(get(scope, slot.bind)) || 0;
+    const up = v >= 0;
+    const tU = node.findOne((n) => n.name === "tri.up");
+    const tD = node.findOne((n) => n.name === "tri.down");
+    const vv = node.findOne((n) => n.name === "val");
+    if (tU) tU.visible = up;
+    if (tD) tD.visible = !up;
+    if (vv) {
+      const body = slot.format ? slot.format.replace("{}", Math.abs(v)) : String(Math.abs(v));
+      vv.characters = (up ? "+" : "−") + body;
+      vv.fills = [{ type: "SOLID", color: up ? env.up : env.down }];
+    }
   } else {
     const v = get(scope, slot.bind);
     if (v == null) return;
@@ -112,20 +128,23 @@ async function renderCard(manifest, ctx, brandMode, pos) {
   frame.x = pos.x; frame.y = pos.y;
   frame.name = `render:${manifest.template}:${brandMode}`;
 
+  // Flatten shared chrome (Header/Footer) so their logos/source become editable
+  // — detachInstance unwraps only one level, leaving nested chrome instances locked.
+  for (const inst of frame.children.filter((c) => c.type === "INSTANCE" && c.getSharedPluginData("pmn", "role") === "chrome")) {
+    try { inst.detachInstance(); } catch (e) {}
+  }
+
   const V = {};
   for (const v of await figma.variables.getLocalVariablesAsync()) V[v.name] = v;
-  for (const fam of ["Inter", "Roboto"]) for (const st of ["Bold", "Medium", "Regular"]) await figma.loadFontAsync({ family: fam, style: st });
-  // symbol glyphs (▲ ▼) fall back to Noto Sans Symbols2 at render time even though the
-  // node's ASSIGNED font is Inter; switching mode re-measures them and needs it loaded.
-  try { await figma.loadFontAsync({ family: "Noto Sans Symbols2", style: "Regular" }); } catch (e) {}
-  // load every font already present in the detached frame — symbol glyphs (▲ ▼ “”)
-  // pull fallback families (e.g. Noto Sans Symbols2), and switching the brand mode
-  // or editing text touches all of them.
+  for (const fam of ["Inter", "Roboto"]) for (const st of ["Bold", "Medium", "Regular", "Black"]) { try { await figma.loadFontAsync({ family: fam, style: st }); } catch (e) {} }
+  for (const st of ["Bold", "SemiBold", "Medium", "Regular"]) { try { await figma.loadFontAsync({ family: "IBM Plex Mono", style: st }); } catch (e) {} }
+  // load every font already present in the detached frame — switching the brand
+  // mode or editing text re-measures all of them (incl. any fallback families).
   const used = new Set();
   for (const t of frame.findAll((n) => n.type === "TEXT")) for (const seg of t.getStyledTextSegments(["fontName"])) used.add(JSON.stringify(seg.fontName));
   for (const f of used) { try { await figma.loadFontAsync(JSON.parse(f)); } catch (e) {} }
 
-  const env = { V, accent: { r: 0.18, g: 0.36, b: 1 }, muted: { r: 0.6, g: 0.65, b: 0.79 } };
+  const env = { V, accent: { r: 0.18, g: 0.36, b: 1 }, muted: { r: 0.6, g: 0.65, b: 0.79 }, up: { r: 0.086, g: 0.78, b: 0.518 }, down: { r: 0.918, g: 0.224, b: 0.263 } };
   if (manifest.brand) {
     const coll = (await figma.variables.getLocalVariableCollectionsAsync()).find((c) => c.name === manifest.brand.collection);
     const mode = coll.modes.find((m) => m.name === brandMode);
@@ -133,12 +152,17 @@ async function renderCard(manifest, ctx, brandMode, pos) {
       frame.setExplicitVariableModeForCollection(coll, mode.modeId);
       const cv = (name) => { const c = V[name].valuesByMode[mode.modeId]; return { r: c.r, g: c.g, b: c.b }; };
       env.accent = cv("color/accent"); env.muted = cv("color/muted");
+      try { env.up = cv("color/up"); env.down = cv("color/down"); } catch (e) {}
+      // v3 cards bind the field gradient to variables (reskins via the mode switch);
+      // legacy manifests with a code-set "field" node are still honoured below.
       if (manifest.field) {
         const fn = frame.findOne((n) => n.name === manifest.field.node);
-        const g = (c) => ({ r: c.r, g: c.g, b: c.b });
-        const p3 = [0, 0.55, 1];
-        fn.fills = [{ type: "GRADIENT_LINEAR", gradientTransform: [[0.707, -0.707, 0.5], [0.707, 0.707, -0.207]],
-          gradientStops: manifest.field.stops.map((s, i) => ({ position: p3[i], color: { ...g(V[s].valuesByMode[mode.modeId]), a: 1 } })) }];
+        if (fn) {
+          const g = (c) => ({ r: c.r, g: c.g, b: c.b });
+          const p3 = [0, 0.55, 1];
+          fn.fills = [{ type: "GRADIENT_LINEAR", gradientTransform: [[0.707, -0.707, 0.5], [0.707, 0.707, -0.207]],
+            gradientStops: manifest.field.stops.map((s, i) => ({ position: p3[i], color: { ...g(V[s].valuesByMode[mode.modeId]), a: 1 } })) }];
+        }
       }
     }
   }
@@ -148,13 +172,15 @@ async function renderCard(manifest, ctx, brandMode, pos) {
   for (const list of manifest.lists || []) {
     const listNode = frame.findOne((n) => n.name === list.node);
     const items = get(ctx, list.bind) || [];
-    listNode.children.filter((c) => c.type === "INSTANCE").forEach((c) => c.remove());
+    // clear example rows (detached frames or instances), keep any source text
+    listNode.children.filter((c) => c.type !== "TEXT").forEach((c) => c.remove());
     const rowComp = figma.currentPage.findOne((n) => n.type === "COMPONENT" && n.name === list.item.component);
     const barSlot = list.item.slots.find((s) => s.kind === "bar");
     const max = barSlot ? Math.max(...items.map((it) => Number(get(it, barSlot.bind)) || 0)) : 0;
     const source = listNode.children.find((c) => c.type === "TEXT");
     for (const item of items) {
-      const r = rowComp.createInstance();
+      // DETACH each clone — instance sublayers cannot be resized (bar widths).
+      const r = rowComp.createInstance().detachInstance();
       listNode.appendChild(r); r.layoutSizingHorizontal = "FILL";
       for (const s of list.item.slots) await fillSlot(r, s, item, max, env);
     }

@@ -1,27 +1,93 @@
 {
-  "template": "market-card-hero-quote",
-  "version": "0.2",
-  "_generated": "by tools/export_manifest.js from Figma — do not hand-edit; re-run the exporter after editing the template in Figma",
+  "template": "hero-quote",
+  "version": "0.3",
+  "_generated": "by tools/export_manifest.js from Figma — do not hand-edit",
   "figma": {
     "fileKey": "ILPUHPFyGRtLnc0JJ6lGyW",
-    "componentName": "PMN / Market Card — Hero Quote (v2 · auto-layout)",
-    "componentNodeId": "28:133",
-    "canvas": [1080, 1080],
+    "componentName": "Card / Hero-Quote",
+    "componentNodeId": "96:248",
+    "canvas": [
+      1080,
+      1080
+    ],
     "autolayout": true
   },
-  "brand": { "collection": "Brand", "modes": ["PMN", "Demo"], "mechanism": "setExplicitVariableModeForCollection" },
-  "field": { "node": "field", "kind": "gradient", "codeSet": true, "stops": ["color/field/start", "color/field/mid", "color/field/end"] },
+  "brand": {
+    "collection": "Brand",
+    "modes": [
+      "PMN",
+      "Demo"
+    ],
+    "mechanism": "setExplicitVariableModeForCollection"
+  },
+  "field": null,
   "slots": [
-    { "name": "#brand.wordmark", "kind": "brand-content", "bind": "brand.wordmark", "token": "color/text" },
-    { "name": "#sponsor", "kind": "brand-content", "bind": "brand.sponsor", "token": "color/muted" },
-    { "name": "#footer", "kind": "brand-content", "bind": "brand.footer", "token": "color/text" },
-    { "name": "#eyebrow", "kind": "text", "bind": "card.tag", "transform": "uppercase", "token": "color/eyebrow-ink" },
-    { "name": "#quote", "kind": "text", "bind": "card.quote", "reflow": true, "token": "color/text", "_note": "editorial serif (Lora), not brand-bound; a per-brand serif token could be added" },
-    { "name": "#attrib", "kind": "text", "bind": "card.attrib", "token": "color/text" },
-    { "name": "#attrib.sub", "kind": "text", "bind": "card.attribSub", "token": "color/muted" },
-    { "name": "#stat.label", "kind": "text", "bind": "card.stat.label", "transform": "uppercase", "token": "color/down" },
-    { "name": "#stat.value", "kind": "text", "bind": "card.stat.value", "token": "color/down" },
-    { "name": "#stat.sub", "kind": "text", "bind": "card.stat.sub", "token": "color/muted" },
-    { "name": "#source", "kind": "text", "bind": "card.source", "format": "Source: {}", "token": "color/muted" }
+    {
+      "name": "#logo.publisher",
+      "kind": "logo",
+      "bind": "brand.publisher"
+    },
+    {
+      "name": "#logo.sponsor",
+      "kind": "logo",
+      "bind": "brand.sponsor"
+    },
+    {
+      "name": "#eyebrow",
+      "kind": "text",
+      "bind": "card.tag",
+      "transform": "uppercase",
+      "token": "color/eyebrow-ink"
+    },
+    {
+      "name": "#quote",
+      "kind": "text",
+      "bind": "card.quote",
+      "reflow": true,
+      "token": "color/text"
+    },
+    {
+      "name": "#attrib",
+      "kind": "text",
+      "bind": "card.attrib",
+      "token": "color/text"
+    },
+    {
+      "name": "#attrib.sub",
+      "kind": "text",
+      "bind": "card.attribSub",
+      "token": "color/muted"
+    },
+    {
+      "name": "#stat.label",
+      "kind": "text",
+      "bind": "card.stat.label",
+      "transform": "uppercase",
+      "token": "color/eyebrow-ink"
+    },
+    {
+      "name": "#stat.value",
+      "kind": "text",
+      "bind": "card.stat.value",
+      "token": "color/accent"
+    },
+    {
+      "name": "#stat.sub",
+      "kind": "text",
+      "bind": "card.stat.sub",
+      "token": "color/muted"
+    },
+    {
+      "name": "#logo.show",
+      "kind": "logo",
+      "bind": "brand.show"
+    },
+    {
+      "name": "#source",
+      "kind": "text",
+      "bind": "card.source",
+      "format": "{}",
+      "token": "color/muted"
+    }
   ]
 }

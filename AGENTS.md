@@ -1,174 +1,97 @@
-# AGENTS.md — generate PMN visuals end to end
+# AGENTS.md — operate the PMN Figma↔code pipeline
 
-This repo is a self-contained pipeline for producing **Prediction Market News**
-(PMN) social visuals: research a market → pull live data → drop the numbers into
-a generator → render brand-correct PNGs. This file is the operating manual for an
-AI agent (or a human) doing that end to end.
+This repo produces **Prediction Market News** social cards through a **Figma-native,
+manifest-driven** pipeline. Figma is the source of truth for visuals; the repo holds the
+generated contract (`templates/*.manifest.json`, `tokens.json`) and the two engines that move
+data between them. Humans: see [`GUIDE.md`](GUIDE.md).
 
----
+> The legacy SVG kit (`lib/pmn.py` SVG helpers, `data-viz/`, `social/`, `episode-01/_*.py`) is
+> **superseded** by this Figma pipeline. `lib/pmn_live.py` (live market data → card dicts) is still
+> the data source. Old Figma pages (v2 Components/Renders) were removed.
 
-## 0. One-time setup
-
-```bash
-# system: librsvg gives `rsvg-convert` (SVG -> PNG). REQUIRED.
-brew install librsvg            # macOS
-# sudo apt-get install librsvg2-bin   # Debian/Ubuntu
-
-# python deps
-pip install -r requirements.txt
-```
-
-Fonts: cards render in Helvetica Neue (native on macOS). On Linux install a close
-grotesk; layout math is unaffected but glyph metrics shift slightly.
-
-Verify the toolchain works:
-
-```bash
-python3 episode-01/_tech_markets.py     # should write PNGs into episode-01/exports-tech/
-```
+Figma file: `ILPUHPFyGRtLnc0JJ6lGyW` · Pages: **📖 Read Me**, **🎨 Foundations**, **🧩 Components**.
 
 ---
 
 ## 1. Mental model
 
-- **`lib/pmn.py`** is the single source of truth: palette, type scale, the grid
-  (`M` margin + `PADIN` panel padding), brand chrome (The Block top-left,
-  "Presented by Polymarket" top-right), the `[PMN]` footer, backgrounds, and the
-  dark data panel. Never hardcode brand colors/spacing in a generator — pull them
-  from here.
-- **`data-viz/_build.py` + `_more.py`** are the card layouts (binary, multi,
-  gauge, leaderboard, hero-quote, area, stacked-bar, scorecard, movers, map…).
-- **`social/_build.py`** has the episode/market/quote/cover cards.
-- **A generator** (`episode-01/_*.py`) is just: a glass monkeypatch + a set of
-  **data dicts** + a render loop. To change a visual you change the data dict and
-  rerun. To make a *new* kind of visual you add a small card function.
-
-The "liquid glass" look is a monkeypatch over `pmn._panel_body` defined at the
-top of each generator. `TINT` controls panel transparency (0.50 see-through →
-0.92 opaque). `pmn.set_background("team-gradient"|"house"|"team-solid"|"team-glow")`
-sets the field. Both are set per render.
-
----
-
-## 2. The pipeline
-
-### Step A — (optional) frame the episode
-Use `skills/podcast-research/` for editorial framing: `workflows/segment-brief.md`,
-`context/question-craft.md`, `workflows/data-pull.md`, plus `style/` for voice.
-This decides *which markets matter* and *what the cards should say*.
-
-### Step B — pull live data
-All scripts have a CLI; only dep is `requests`. Endpoint docs:
-`skills/market-data/references/endpoints.md`.
-
-```bash
-cd skills/market-data/scripts
-
-# Polymarket (odds, event/market volume)
-python3 polymarket.py top 10                 # top markets by total volume + odds
-python3 polymarket.py events 20              # open events by 24h volume
-python3 polymarket.py market <event-slug>    # one market/event odds + token ids
-
-# Hyperliquid (perps; HIP-3 builder dexs incl. Trade.xyz = `xyz`)
-python3 hyperliquid.py find SPCX CRWV NVDA   # locate tickers across all dexs
-python3 hyperliquid.py dex xyz 25            # one dex board by 24h notional vol
-python3 hyperliquid.py perps 20              # top HL perps
-
-# CoinGecko / DeFiLlama / DexScreener
-python3 coingecko.py price <id>
-python3 defillama.py stables 10
-python3 dexscreener.py token <address>
+```
+Figma component  ──[ tools/export_manifest.js ]──►  templates/<name>.manifest.json   (the contract)
+manifest + data + brand  ──[ tools/render.js ]──►  filled card (PNG) back in Figma
+Figma variables  ──[ tools/export_tokens.js ]──►  templates/tokens.json              (token mirror)
 ```
 
-Decoding gotchas are handled in the modules (Polymarket `odds` is a list of
-`{outcome, price, token_id}`; Hyperliquid returns strings cast to float). Always
-record the **pull timestamp** — it goes on the card as the source stamp.
+- A card is a **component** = a `Background` instance + a `Header` + content + a `Footer`, all bound
+  to **Brand** tokens. **Brands are MODES** of the `Brand` variable collection (PMN, Demo, …).
+- Slots are nodes named `#…` (content) / `@…` (geometry) carrying `pmn` shared plugin data
+  (`bind·kind·format·transform·scale·reflow`). The renderer dispatches on `kind`.
+- All three tools are plain Plugin API scripts: **paste the file into a `use_figma` call** (load the
+  `figma-use` skill first) and append the documented call. On-demand, no headless infra.
 
-### Step C — update the data dict
-Open the matching generator in `episode-01/` and edit the dict near the bottom.
-Example (`_tech_markets.py`):
+## 2. Running the tools
 
-```python
-AIMODEL = {
-    "tag": "Top AI model · end of June", "title": ["One lab is running", "away with it"],
-    "leader": ("Anthropic", 85), "field": [("Google", 10), ("OpenAI", 4), ("xAI", 0.4)],
-    "caption": "Claude Opus 4.8 took #1 on May 27. The field fights for scraps.",
-    "source": "Polymarket · Jun 8, 2026"}     # <- update the as-of date
+**Render a card** (run on the 🧩 Components page so the Row component resolves):
+```js
+const M = /* templates/<name>.manifest.json */;
+const ctx = { card: {/* §5 schema */}, brand: { logos: { publisher:{id}, sponsor:{id}, show:{id} } } };
+return await renderCard(M, ctx, "PMN", { x, y });   // returns { nodeId, imageSlots, shot }
 ```
+For `image` slots: take the returned `imageSlots[].nodeId`, fetch the URL bytes in the orchestration
+layer, and `upload_assets` them onto that node (the sandbox can't fetch URLs).
 
-### Step D — render
-```bash
-python3 episode-01/_robostrategy.py     # -> exports-robostrategy/  (episode data cards)
-python3 episode-01/_markets.py          # -> exports-markets/       (top-volume leaderboards)
-python3 episode-01/_tech_markets.py     # -> exports-tech/          (bespoke tech cards)
-python3 episode-01/_covers.py           # -> exports-robostrategy/  (real-photo covers)
-```
+**Export a manifest** (after a contract change): set the page to 🧩 Components, then
+`return await exportManifest("<componentNodeId>", "<name>", "ILPUHPFyGRtLnc0JJ6lGyW")` → write
+`templates/<name>.manifest.json`.
 
-Each writes `<name>.svg` + `<name>.png`. Exports are gitignored — they regenerate.
+**Export tokens** (after a colour/token change): `return await exportTokens()` → write `templates/tokens.json`.
 
-### Step E — review
-Open the PNGs. Check: nothing overlaps the `[PMN]` footer or the source line;
-no element crosses a panel border; captions wrap to ≤2 lines; white/muted text is
-legible on the chosen background (the brighter the field, the more opaque `TINT`
-should be — team-gradient's bright corner needs the most cover).
+## 3. Slot kinds (how the renderer fills each)
 
----
-
-## 3. Generators and what they emit
-
-| Generator | Output | Layouts |
+| kind | node | renderer behaviour |
 |---|---|---|
-| `_robostrategy.py` | `exports-robostrategy/` | cover, binary, gauge, leaderboard, multi, **divergence** (custom) |
-| `_markets.py` | `exports-markets/` | Polymarket 24h/7d/30d leaderboards × 4 backgrounds + glass sweep |
-| `_tech_markets.py` | `exports-tech/` | **valuation curve**, **dominance**, **hype-vs-odds** (all custom) + per-background glass |
-| `_covers.py` | `exports-robostrategy/` | real-photo / logo episode covers (1:1, 16:9, 9:16) |
+| `text` | `#…` | sets `characters` from `bind` (+ `format`/`transform`) |
+| `bar` | `@…` rect | width = `bind`/100 × track, or `scale:ratio-of-max` for lists |
+| `arc` | `@…` ellipse | sweeps the donut `arcData` proportional to `bind` |
+| `linechart` | `@…` frame | draws gridlines + area + polyline from a `[[label,value]…]` series |
+| `delta` | `#…` frame | shows `tri.up`/`tri.down` shape + colours `val` green/red by the **sign** of `bind` |
+| `image` | `@…` rect/ellipse | photo well — returns node id for out-of-band `upload_assets` |
+| `logo` | `#…` instance | `swapComponent` to the brand's logo (`bind` = `brand.{publisher\|sponsor\|show}`) |
+| `list` | frame | clears + clones a Row (`pmn:list-item`) per `bind` item; **detaches each clone** |
 
----
+## 4. v3 architecture specifics (already wired — don't re-introduce the old assumptions)
 
-## 4. Recipes
+- **Shared chrome:** `Header`/`Footer` are nested instances tagged `pmn:role=chrome`. The exporter
+  reads *through* them (transparent roles: `chrome|background|showmark`); the renderer **detaches**
+  them after the top-level detach so logos swap and `#source` fills.
+- **Field:** the `Background` instance's gradient stops are **bound to `color/field/*`** → it reskins
+  on the brand-mode switch. There is **no code-set `field` node** (manifest `field` is `null`).
+- **Lists:** instance sublayers can't be resized, so the renderer **clones AND detaches** each Row
+  before filling (this is why v2's bars looked uniform — that bug is fixed).
+- **Fonts:** Inter weights are limited to **Bold / Medium / Black** (Roboto, used by the Demo mode,
+  lacks Extra/Semi Bold) so brand-font-swap never hits a missing style. Numbers use **IBM Plex Mono**.
 
-**Change the numbers on a card:** edit its data dict, rerun the generator.
+## 5. Per-template `card` data schema
 
-**Render every brand background at its own transparency:** see the `BG_TINT` map
-in `_tech_markets.py` — calmer fields get a more see-through panel, brighter ones
-a more opaque one. Reuse that pattern.
+```
+binary       { tag, question, outcomes:[{label,pct},{label,pct}], source }
+leaderboard  { tag, question, rows:[{name, value, mag}], source }                 # mag drives ratio-of-max bars
+divergence   { tag, question, left:{label,delta,detail,sub}, right:{…}, caption, source }   # delta is a signed number
+gauge        { tag, question, pct, label, source }
+timeseries   { tag, question, current, delta, series:[[label,value]…], source }
+quote        { tag, quote, attrib, attribSub, source }
+hero-quote   { tag, quote, attrib, attribSub, stat:{label,value,sub}, source }
+cover        { tag, subtitle, source }
+guest-announce { tag, photo:<url>, guest:{name,role,company}, source }
+episode      { tag, question, guest:{photo:<url>, name, role}, source }
+```
+Every card also fills chrome from `ctx.brand.logos` (publisher/sponsor/show) and `#source` from `card.source`.
 
-**Add a new card type:** write a `card_x(w, h, d)` that returns an SVG string,
-following the structure of `card_curve`/`card_dominance` in `_tech_markets.py`:
-`pmn.svg_open` → `pmn.defs` → `dv._bg` (background) → `dv.chrome` → your panels
-via `dv.panel(...)` → caption → `dv.footer` + source → `pmn.svg_close`. Use
-`M`, `PADIN`, `ty()` for spacing/type so it stays on-grid.
+## 6. Tests
+`python3 tools/test_pmn.py` — validates all manifests, `tokens.json`, `brands.json`, and that the
+renderer supports every slot kind in use. **Run after every re-export and before committing.**
 
-**Start a new episode:** copy `episode-01/` to `episode-02/`, swap the data dicts
-and (for covers) the assets in `assets/`, rerun. Paths are relative to the
-generator, so it just works.
-
----
-
-## 5. Brand rules (do not violate)
-
-- **Chrome is fixed:** The Block leads top-left; "Presented by Polymarket" is the
-  top-right sponsor stamp; `[PMN]` anchors the footer. Don't move or recolor them.
-- **Field is electric-blue.** Green/red/gold are **data semantics only** (up /
-  down / highlight) — never field or decoration colors.
-- **Type sizes as a ratio of canvas width** (`ty()`), so it stays legible in a
-  mobile feed. Default canvas 1080×1080; covers also 16:9 / 9:16.
-- **Every card is dated** at the source line. Re-pull if data is stale.
-- **Voice** (for any copy — tags, titles, captions): sharp, analytical,
-  crypto-native, concise. Observation → explanation → implication. No em-dashes
-  (en-dashes OK), no buzzwords, no emojis/hashtags unless asked. See
-  `skills/podcast-research/style/` for the full voice spec.
-- **Contrast floor:** body text ≥ 4.5:1, bars ≥ 3:1 against the panel.
-
----
-
-## 6. Troubleshooting
-
-- `command not found: rsvg-convert` → install librsvg (Step 0).
-- `Entity 'AMP' not defined` on render → an `&` ended up in an eyebrow/tag string;
-  `pmn.eyebrow` upper-cases after escaping, which breaks `&amp;`. Avoid `&` in
-  eyebrow/tag text (use "and"/"+").
-- Text overlapping the footer → the caption ran to 3 lines or the panel is too
-  tall; shorten the caption or reduce `GH`/`CAPG` (see the rhythm constants at
-  the top of `_tech_markets.py`).
-- Fonts look wrong on Linux → install a Helvetica-class grotesk.
+## 7. Conventions
+- Manifests + `tokens.json` are **generated — never hand-edit.** Re-run the exporters.
+- Component names are **brand-neutral** (`Card / Binary`, `Header`, `Background`). Brands are modes.
+- Voice for any copy: sharp, analytical, crypto-native, concise. No em-dashes, buzzwords, or emojis.
+- Every card is dated via `card.source`. Re-pull data if stale (`lib/pmn_live.py`).
