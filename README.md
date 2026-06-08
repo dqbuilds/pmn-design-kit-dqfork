@@ -16,6 +16,7 @@ market leaderboards, and the episode-01 (RoboStrategy) visual set.
 | `episode-01/_markets.py` | `episode-01/exports-markets/` | Top-volume Polymarket leaderboards (24h / 7d / 30d) across 4 brand backgrounds + a glass-transparency sweep |
 | `episode-01/_tech_markets.py` | `episode-01/exports-tech/` | Bespoke technology-market cards — SpaceX implied-valuation curve, AI-model dominance, Optimus hype-vs-odds — with per-background glass transparency |
 | `episode-01/_covers.py` | `episode-01/exports-robostrategy/` | Real-photo / logo episode covers (1:1, 16:9, 9:16) |
+| `_podcast_covers.py` | `exports-podcast-covers/` | Show cover art — both PMN logos (wordmark + monogram) across all 4 backgrounds (1500×1500) |
 
 ## Architecture
 

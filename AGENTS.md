@@ -122,6 +122,12 @@ should be — team-gradient's bright corner needs the most cover).
 | `_markets.py` | `exports-markets/` | Polymarket 24h/7d/30d leaderboards × 4 backgrounds + glass sweep |
 | `_tech_markets.py` | `exports-tech/` | **valuation curve**, **dominance**, **hype-vs-odds** (all custom) + per-background glass |
 | `_covers.py` | `exports-robostrategy/` | real-photo / logo episode covers (1:1, 16:9, 9:16) |
+| `_podcast_covers.py` (repo root) | `exports-podcast-covers/` | show cover art — both PMN logos (wordmark + monogram) × 4 backgrounds, 1500×1500 |
+
+**Two-logo rule:** tight/dense square cards use the compact `[PMN •]` monogram in
+the footer; larger formats with room (covers, 16:9/9:16) use the full PMN show
+wordmark (`brand/marks/pmn-wordmark-white.svg`, routed via the `"pmn-wordmark"`
+footer name → `pmn.show_wordmark()`).
 
 ---
 
