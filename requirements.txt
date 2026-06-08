@@ -1,2 +1,6 @@
+# Rendering (lib + generators)
 numpy>=1.24
 Pillow>=10.0
+
+# Data sourcing (data-sources/*.py — Polymarket, Hyperliquid, CoinGecko, DeFiLlama, DexScreener)
+requests>=2.28

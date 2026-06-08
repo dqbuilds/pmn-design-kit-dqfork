@@ -28,8 +28,42 @@ data-viz/_build.py    # card_shell + binary / multi / timeseries / hero / area /
 data-viz/_more.py     # gauge / leaderboard / scorecard / movers / map / scatter
 social/_build.py      # episode card, market card, quote card, podcast cover
 episode-01/           # the episode generators + the guest assets they use
+data-sources/         # the scripts that SOURCED the market data (see below)
 brand/                # The Block + Polymarket marks, PMN logo lockups
 ```
+
+## Data sourcing (`data-sources/`)
+
+The generators render from numbers **hardcoded** in their data dicts, but those
+numbers were pulled with the scripts in `data-sources/` (each has a CLI; the only
+dependency is `requests`). Full endpoint docs in `data-sources/ENDPOINTS.md`.
+
+```bash
+cd data-sources
+python3 polymarket.py top 10                  # top markets by volume + odds
+python3 polymarket.py events 20               # open events by 24h volume
+python3 polymarket.py market <slug>           # one market's odds + token ids
+python3 hyperliquid.py find SPCX CRWV NVDA    # locate tickers across HIP-3 dexs
+python3 hyperliquid.py dex xyz 25             # Trade.xyz board by 24h volume
+python3 coingecko.py price <id>               # cross-ecosystem price
+python3 defillama.py stables 10               # stablecoin supply, TVL, fees
+python3 dexscreener.py token <address>        # DEX liquidity for a contract
+```
+
+**Provenance for the shipped cards (pulled 2026-06-08):**
+
+| Card data | Source script / source |
+|---|---|
+| Optimus odds, AI-model race, SpaceX IPO cap ladder, top-volume leaderboards | `polymarket.py` (Polymarket Gamma) |
+| AI + hardware perp 24h volumes (Trade.xyz / `xyz` HIP-3 dex) | `hyperliquid.py` (Hyperliquid `/info`) |
+| Crypto VC funding decline (deals −59% / dollars +37% YoY) | The Block — `theblock.co/data` (manual + web; no script) |
+
+To refresh: re-run the relevant script and paste the new figures into the data
+dict at the bottom of the matching generator.
+
+> Note: the editorial framing for the episode used a separate `podcast-research`
+> prompt/workflow skill. That's prompt scaffolding, not data-pulling code, so it
+> isn't included here — ask if you want a copy added.
 
 The "liquid glass" panel is a monkeypatch over `pmn._panel_body` applied inside
 each generator, so the same dark data panels render translucent over the brand
