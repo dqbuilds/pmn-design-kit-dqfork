@@ -1,0 +1,18 @@
+{
+  "_doc": "Example fill input for templates/binary.manifest.json. The renderer instantiates the Figma component, sets the brand mode, and writes these values into the named slots. 'card' is per-render data (often from lib/pmn_live.py); 'brand' selects/overrides the show. Values below are a real live pull (2026-06-08).",
+
+  "template": "market-card-binary",
+  "brand": {
+    "mode": "PMN",
+    "overrides": { "wordmark": "THE BLOCK", "sponsor": "PRESENTED BY · Polymarket", "footer": "[PMN]" }
+  },
+  "card": {
+    "tag": "Live odds · Polymarket",
+    "question": "Will Jesus Christ return before 2027?",
+    "outcomes": [
+      { "label": "Yes", "pct": 2 },
+      { "label": "No",  "pct": 98 }
+    ],
+    "source": "Polymarket · Jun 8, 2026"
+  }
+}

@@ -14,3 +14,6 @@ venv/
 **/exports-*/
 *.svg
 !brand/marks/*.svg
+
+# Live-data snapshots (regenerate with lib/pmn_live.py)
+**/data/live.json

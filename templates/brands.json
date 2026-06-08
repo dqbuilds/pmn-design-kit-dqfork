@@ -1,0 +1,21 @@
+{
+  "_doc": "Brand registry. The render pipeline picks a brand, sets its variable mode, and passes this config into renderCard as ctx.brand. The 'logo' slot kind swaps each logo instance to the brand's component by id; 'brand-content' text slots use the text values. Logo ids are file-local — if a logo component is recreated, update the id here (or re-run a lookup by name).",
+  "PMN": {
+    "mode": "PMN",
+    "logos": {
+      "publisher": { "name": "Logo / The Block", "id": "35:143" },
+      "sponsor":   { "name": "Logo / Polymarket", "id": "35:147" },
+      "show":      { "name": "Logo / PMN", "id": "35:148" }
+    },
+    "text": { "wordmark": "THE BLOCK", "sponsor": "PRESENTED BY · Polymarket", "footer": "[PMN]" }
+  },
+  "Demo": {
+    "mode": "Demo",
+    "logos": {
+      "publisher": { "name": "Logo / Demo News", "id": "49:192" },
+      "sponsor":   { "name": "Logo / Acme", "id": "49:194" },
+      "show":      { "name": "Logo / Demo", "id": "49:196" }
+    },
+    "text": { "wordmark": "DEMO NEWS", "sponsor": "PRESENTED BY · Acme", "footer": "[DEMO]" }
+  }
+}

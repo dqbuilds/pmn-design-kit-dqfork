@@ -1,0 +1,25 @@
+{
+  "template": "market-card-timeseries",
+  "version": "0.2",
+  "_generated": "by tools/export_manifest.js from Figma — do not hand-edit; re-run the exporter after editing the template in Figma",
+  "figma": {
+    "fileKey": "ILPUHPFyGRtLnc0JJ6lGyW",
+    "componentName": "PMN / Market Card — Timeseries (v2 · auto-layout)",
+    "componentNodeId": "29:133",
+    "canvas": [1080, 1080],
+    "autolayout": true
+  },
+  "brand": { "collection": "Brand", "modes": ["PMN", "Demo"], "mechanism": "setExplicitVariableModeForCollection" },
+  "field": { "node": "field", "kind": "gradient", "codeSet": true, "stops": ["color/field/start", "color/field/mid", "color/field/end"] },
+  "slots": [
+    { "name": "#brand.wordmark", "kind": "brand-content", "bind": "brand.wordmark", "token": "color/text" },
+    { "name": "#sponsor", "kind": "brand-content", "bind": "brand.sponsor", "token": "color/muted" },
+    { "name": "#footer", "kind": "brand-content", "bind": "brand.footer", "token": "color/text" },
+    { "name": "#eyebrow", "kind": "text", "bind": "card.tag", "transform": "uppercase", "token": "color/eyebrow-ink" },
+    { "name": "#headline", "kind": "text", "bind": "card.question", "reflow": true, "token": "color/text" },
+    { "name": "#ts.current", "kind": "text", "bind": "card.current", "format": "{}%", "token": "color/text" },
+    { "name": "#ts.delta", "kind": "text", "bind": "card.delta", "token": "color/up" },
+    { "name": "@ts.plot", "kind": "linechart", "bind": "card.series" },
+    { "name": "#source", "kind": "text", "bind": "card.source", "format": "Source: {}", "token": "color/muted" }
+  ]
+}

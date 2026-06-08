@@ -23,6 +23,7 @@ LIB, DV, SOC = (os.path.join(ROOT, d) for d in ("lib", "data-viz", "social"))
 OUT = os.path.join(HERE, "exports-robostrategy"); os.makedirs(OUT, exist_ok=True)
 sys.path.insert(0, LIB)
 import pmn
+import pmn_live          # live-data adapter (pull -> dict, with cached fallback)
 
 TINT = 0.72   # see-through glass tint (panel reads the team-gradient through it)
 
@@ -155,6 +156,9 @@ PERPS = [("Micron (MU)", 102.6, "$102.6M"), ("Nvidia (NVDA)", 29.3, "$29.3M"),
          ("Tesla (TSLA)", 8.2, "$8.2M")]
 PERPS_META = {"tag": "AI + hardware perps · 24h volume",
               "q": ["Where crypto-native", "risk went"]}
+# ── live refresh (opt-in): re-pull the curated board from Hyperliquid; the
+#    committed PERPS above is the cached fallback if the pull fails ───────────
+PERPS, PERPS_SRC = pmn_live.perps_leaderboard(pmn_live.PERPS_TICKERS, fallback=PERPS)
 
 AIMODEL = {"tag": "Top AI model · end of June", "question": ["Who leads the", "model race?"],
            "outcomes": [("Anthropic", 85), ("Google", 11), ("OpenAI", 4)], "src": "Polymarket"}
@@ -180,7 +184,7 @@ jobs = [
                                                 color=DOWN), src="The Block")(S, S, FUNDING_GAUGE)),
     ("04-perps-leaderboard",lambda: dv.card_shell(S, S, PERPS_META["tag"], PERPS_META["q"],
                                                   lambda x,y,pw,ww: more.leaderboard_panel(x,y,pw,ww,PERPS),
-                                                  hs_ratio=0.050, source="Trade.xyz · Hyperliquid")),
+                                                  hs_ratio=0.050, source=PERPS_SRC)),
     ("05-aimodel-multi",    lambda: dv.card_multi(S, S, AIMODEL)),
     ("06-funding-divergence",lambda: card_divergence(S, S, DIVERGE)),
 ]
