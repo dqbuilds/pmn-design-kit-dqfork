@@ -14,6 +14,9 @@ venv/
 **/exports-*/
 *.svg
 !brand/marks/*.svg
+# static vector assets (frames + lower-thirds are the source of truth, keep them)
+!frames/*.svg
+!frames/lower-thirds/*.svg
 
 # Live-data snapshots (regenerate with lib/pmn_live.py)
 **/data/live.json

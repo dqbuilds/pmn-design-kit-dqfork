@@ -28,7 +28,7 @@ os.makedirs(OUT, exist_ok=True)
 
 # Final four (Kelvin, 2026-06-03). Wordmarks sign the cards; marks lead cover/avatar.
 #   sans-news · bold-bar  = wordmarks   |   monogram · arrow-n = marks
-FOOTER_LOGO = "sans-news"
+FOOTER_LOGO = "pmn-wordmark"   # larger-format covers use the full show wordmark
 
 # Platform size matrix
 SIZES = {
@@ -51,7 +51,7 @@ def aspect(w, h):
 
 # footer height per lockup — stacked/pictorial marks need more height to read
 _FOOTER_H = {"monogram": 0.045, "sans-news": 0.050, "sans-stack": 0.050,
-             "bold-bar": 0.072, "arrow-n": 0.090}
+             "bold-bar": 0.072, "arrow-n": 0.090, "pmn-wordmark": 0.038}
 
 def footer_sig(w, h, which=None, align="left"):
     """Real PMN lockup, bottom signature (Block already leads top-left).
@@ -319,9 +319,14 @@ def podcast_cover(w, h, mark="arrow-n"):
     # subtle top eyebrow
     out += [eyebrow(w/2, round(h*0.165), "The Block original", color=C.muted,
                     size=round(w*0.018), anchor="middle")]
-    # centred mark
-    mh = round(h * (0.42 if mark == "arrow-n" else 0.20))
-    out += [logo(mark, w/2, round(h*0.30), mh, align="center")]
+    # centred hero mark — wordmark/monogram sized by width, pictorial by height
+    if mark == "pmn-wordmark":
+        mw = round(w*0.82); mh = round(mw / pmn.show_wordmark_aspect())
+    elif mark == "monogram":
+        mw = round(w*0.46); mh = round(mw / logo_aspect("monogram"))
+    else:  # arrow-n pictorial
+        mh = round(h*0.42)
+    out += [logo(mark, w/2, round(h*0.45) - mh//2, mh, align="center")]
     # base endorsement row: [The Block]  |  [Polymarket]  — centred, measured
     by = round(h*0.875)
     bh = round(w*0.026)

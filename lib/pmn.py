@@ -147,6 +147,26 @@ def _inner(path: Path) -> tuple[str, float, float]:
 
 _BLOCK_INNER, _BLOCK_W, _BLOCK_H = _inner(MARKS / "the-block-primary-white.svg")
 _POLY_INNER,  _POLY_W,  _POLY_H  = _inner(MARKS / "polymarket-wordmark-white.svg")
+# PMN show wordmark (white "PREDICTION MARKET NEWS" + blue dot) — the lockup for
+# LARGER formats with room to breathe (covers, 16:9/9:16). Tight square data
+# cards keep the compact [PMN •] monogram instead.
+_PMN_INNER, _PMN_W, _PMN_H = _inner(MARKS / "pmn-wordmark-white.svg")
+
+
+def show_wordmark(x: float, y: float, h: float, align: str = "left",
+                  opacity: float = 1.0) -> str:
+    """Place the full PMN wordmark (vector) scaled to cap-height `h`."""
+    s = h / _PMN_H
+    w = _PMN_W * s
+    if align == "right":  x -= w
+    elif align == "center": x -= w / 2
+    return (f'<g transform="translate({x:.1f},{y:.1f}) scale({s:.5f})" '
+            f'opacity="{opacity}" aria-label="Prediction Market News">{_PMN_INNER}</g>')
+
+
+def show_wordmark_aspect() -> float:
+    """w/h of the PMN wordmark (for layout math)."""
+    return _PMN_W / _PMN_H
 
 
 def _png_size(p: Path) -> tuple[int, int]:
@@ -160,7 +180,11 @@ _LOGO_B64: dict[int, tuple[str, int, int]] = {}
 def logo(which, x: float, y: float, h: float, align: str = "left",
          opacity: float = 1.0) -> str:
     """Place a real PMN lockup (by name or slice index). Embeds the vector art
-    as a transparent PNG (preserves the dot-matrix patterns exactly)."""
+    as a transparent PNG (preserves the dot-matrix patterns exactly).
+    The special name "pmn-wordmark" routes to the vector show wordmark (the
+    larger-format lockup) instead of a PNG slice."""
+    if which == "pmn-wordmark":
+        return show_wordmark(x, y, h, align=align, opacity=opacity)
     idx = LOGOS[which] if isinstance(which, str) else which
     if idx not in _LOGO_B64:
         p = LOGO_DIR / f"logo-{idx:02d}.png"
@@ -176,6 +200,8 @@ def logo(which, x: float, y: float, h: float, align: str = "left",
 
 def logo_aspect(which) -> float:
     """w/h of a lockup (for layout math)."""
+    if which == "pmn-wordmark":
+        return show_wordmark_aspect()
     idx = LOGOS[which] if isinstance(which, str) else which
     iw, ih = _png_size(LOGO_DIR / f"logo-{idx:02d}.png")
     return iw / ih

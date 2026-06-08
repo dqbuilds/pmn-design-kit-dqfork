@@ -32,7 +32,7 @@ pipeline** that fills those components with live data and exports finished asset
 
 **Docs:** [`GUIDE.md`](GUIDE.md) (humans — make a card / brand / template, update code) ·
 [`AGENTS.md`](AGENTS.md) (agents — run the pipeline, slot kinds, per-template data schemas) ·
-[`HANDOFF.md`](HANDOFF.md) (session/architecture notes).
+[`FIGMA.md`](FIGMA.md) (file link + node-id map + repo mapping) · [`HANDOFF.md`](HANDOFF.md).
 
 ---
 
@@ -136,6 +136,21 @@ Full steps in [`GUIDE.md`](GUIDE.md). Short version:
   `renderCard(..., brand, ...)` with live data.
 - **New template** → duplicate **Scaffold**, build content, name `#`/`@` slots + tag them, run
   `export_manifest.js`.
+
+---
+
+## Broadcast & legacy assets
+
+The card *generators* are superseded by the Figma pipeline above, but the repo also holds
+production assets and the original SVG kit, kept for reference:
+
+- **`frames/`** — static 1920×1080 on-air **broadcast frames** (Single / Two / Three / Four-cam
+  + market overlay) and **lower-thirds** name chips. These are design exports, not
+  code-generated — see `frames/README.md`. (`lib/pmn.py` still has `chrome()` + `name_chip()`
+  if you ever build a frame generator.)
+- **Legacy SVG generators** (superseded for cards): `lib/pmn.py`, `data-viz/`, `social/`,
+  `episode-01/_*.py`, and `_podcast_covers.py` (show cover art — both PMN logos × 4
+  backgrounds, 1500×1500). `lib/pmn_live.py` (live data) is still used by the current pipeline.
 
 ---
 
